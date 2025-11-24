@@ -1,5 +1,4 @@
 import java.util.Random;
-import java.util.Scanner;
 
 public class GuessTheDoorGame {
 
@@ -15,12 +14,12 @@ public class GuessTheDoorGame {
 
         Random random = new Random();
         int[][] allPossibleDoorArrays = {doorArray1, doorArray2, doorArray3}; // ein Array von int Arrays
-        int[] doorArray = allPossibleDoorArrays[random.nextInt(2)];  // 0,1,2
+        int[] doorArray = allPossibleDoorArrays[random.nextInt(3)];  // 0,1,2
         return doorArray;
     }
 
     //Strategieauswahl   1 = change, 2 = keep
-    public static void runSimulation(int strategy) {
+    public static void runSimulation(int strategy, int[] doorArray, int userPick, int gameMasterDoorPick) {
         // 3 Türen
         // 1 Tür wird vom spieler ausgewählt, NICHT geöffnet
         // Moderator: öffnet eine Tür die NICHT vom spieler ausgewählt ist, UND NICHT den preis hat.
@@ -31,19 +30,7 @@ public class GuessTheDoorGame {
         //Wechseln: 0.5
         //Nichtwechseln: 0.
 
-        int[] doorArray = generateDoorCombinations();
-
         System.out.println("There are 3 doors. Behind one of them is the prize! Pick from door 1,2,3");
-        Scanner scanner = new Scanner(System.in);
-        int userPick = scanner.nextInt();
-
-        int max = 3;
-        int gameMasterDoorPick = (int) (Math.random() * max) + 1; // 0,1,2
-
-
-        while (userPick == gameMasterDoorPick) {
-            gameMasterDoorPick = (int) (Math.random() * max) + 1; // Game master öffnet nie dieselbe tür wie spieler
-        }
 
         System.out.println("The game master opens door:" + gameMasterDoorPick);
         // 1 = geöffnete tür, an position x wird die tür mit wert 1 geöffnet
@@ -55,7 +42,6 @@ public class GuessTheDoorGame {
         // {1,3,0]
         int oldUserPick = userPick;
 
-        //TODO: mit CASE umschreiben
         if (strategy == 1) {
             //userCharInput == 'y') {
             System.out.println("You picked " + userPick + ", GM already opened: " + (gameMasterDoorPick) + " Opening remaining door");
@@ -95,12 +81,23 @@ public class GuessTheDoorGame {
 
     public static void main(String[] args) {
 
-        int n = 20; //wiederholungen
+        int n = 1000;
+        int max = 3; // range 1-3
         System.out.println(n + " Wiederholungen der Runden______");
+
         for (int i = 1; i <= n; i++) {
-            runSimulation(1); // change
-            runSimulation(2); // keep Door
-            //System.out.println("CHANGE Sim loop complete: " + i);
+            // Zufallswerte EINMAL pro Durchgang generieren
+            int[] doorArray = generateDoorCombinations();
+            int userPick = (int) (Math.random() * max) + 1;
+            int gameMasterDoorPick = (int) (Math.random() * max) + 1;
+
+            //gm darf nicht die tür mit preis wählen & nicht die usertü wählen
+            while (userPick == gameMasterDoorPick || doorArray[gameMasterDoorPick - 1] == 3) {
+                gameMasterDoorPick = (int) (Math.random() * max) + 1;
+            }
+
+            runSimulation(1, doorArray.clone(), userPick, gameMasterDoorPick);
+            runSimulation(2, doorArray.clone(), userPick, gameMasterDoorPick);
         }
 
         double averageSuccessSwitch = winCountChange / simulationCountChangeDoor;
@@ -108,8 +105,8 @@ public class GuessTheDoorGame {
 
 
         System.out.println("_________________");
-        System.out.println("mittlere Erfolgswahrscheinlichkeit SWITCH: " + averageSuccessSwitch + "   " + "total= " + simulationCountChangeDoor + "   " + "wins= " + winCountChange);
-        System.out.println(("mittlere Erfolgswahrscheinlichkeit KEEP:" + averageSuccessKeep + "   " + "total= " + simulationCountKeepDoor + "   " + "wins= " + winCountKeepDoor));
+        System.out.println("mittlere Erfolgswahrscheinlichkeit SWITCH: " + averageSuccessSwitch + "   " + "totalgames= " + simulationCountChangeDoor + "   " + "wins= " + winCountChange);
+        System.out.println(("mittlere Erfolgswahrscheinlichkeit KEEP:" + averageSuccessKeep + "   " + "totalgames= " + simulationCountKeepDoor + "   " + "wins= " + winCountKeepDoor));
 
     }
 
