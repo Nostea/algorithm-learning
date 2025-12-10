@@ -20,19 +20,15 @@ public class RomanNumerals {
          */
 
         Scanner scanner = new Scanner(System.in);
-        //System.out.print("Bitte geben sie eine römische Zahl ein(1 - 3999): ");
-        //String romanNumeral = scanner.next(); //XVII
-        String romanNumeral = "MMMCMXCIV";
-        /*
-        int i = 1;
-        int v = 5;
-        int x = 10;
-        int l = 50;
-        int c = 100;
-        int d = 500;
-        int m = 1000;
+        System.out.print("Bitte geben sie eine römische Zahl ein(1 - 3999): ");
+        String romanNumeral = scanner.next().trim().toUpperCase();
+
+        /* Wichtige test cases:
+         I = 1
+         MMMCMXCIX = 3999
+         CDXLIV = 444
+         MCMXC = 1990
          */
-        int resultNumber = 0;
 
         ArrayList<String> romanNumeralList = new ArrayList<String>(); // 4
 
@@ -41,7 +37,6 @@ public class RomanNumerals {
         }
 
         ArrayList<Integer> parsedNumberList = new ArrayList<Integer>();
-        int letterValue;
         String letter;
         for (int j = 0; j < romanNumeralList.size(); j++) {
             letter = romanNumeralList.get(j);
@@ -81,20 +76,30 @@ public class RomanNumerals {
 
         for (int i = 0; i < parsedNumberList.size(); i++) {
             // fall: nächster buchstabe ist gleich groß oder kleiner. Addition
-            if (parsedNumberList.get(i) < parsedNumberList.get(i + 1)) {
-                parsedNumberList.set(i, parsedNumberList.get(i + 1) - parsedNumberList.get(i)); // an der Position 4, soll der wert von der Rechnung pos5-pos4 eingetragen werden
-                parsedNumberList.remove(i + 1); // löscht den höheren Listeneintrag, damit nur das ergebnis übrig bleibt
-                // 1000,1000,1000,900,>>>10,100<<<,>>>1,5<<<
-                // 1000, 1000, 1000, 900,
-            } else if (parsedNumberList.get(i) == parsedNumberList.get(i + 1)) {
-                System.out.println("gleich, nix wird ersetzt");
+            if (i != parsedNumberList.size() - 1) { // solange nich am endindex der schleife (wegen vorausschauendem check prinzip unten)
+                if (parsedNumberList.get(i) < parsedNumberList.get(i + 1)) {
+                    parsedNumberList.set(i, parsedNumberList.get(i + 1) - parsedNumberList.get(i)); // an der Position 4, soll der wert von der Rechnung pos5-pos4 eingetragen werden
+                    parsedNumberList.remove(i + 1); // löscht den höheren Listeneintrag, damit nur das ergebnis übrig bleibt
+                    // 1000,1000,1000,900,>>>10,100<<<,>>>1,5<<<
+                    // 1000, 1000, 1000, 900,
+                    //i = i - 1; <- für sauberkeit den index zurück damit die neue zahl mit in den algorthmus neu gecheckt wird. Aber nicht notwendig weil es sowieso schon funktioniert
+                } else if (parsedNumberList.get(i) == parsedNumberList.get(i + 1)) {
+                    System.out.println("gleich, nix wird ersetzt");
+                } else {
+                    System.out.println("größereZahl > kleinereZahl, nix wird ersetzt,  default");
+                }
             } else {
-                System.out.println("größereZahl > kleinereZahl, nix wird ersetzt,  default");
+                System.out.print("");
             }
+
         }
 
         System.out.println("step2: " + parsedNumberList);
+        int resultNumber = 0;
+        for (int i = 0; i < parsedNumberList.size(); i++) {
+            resultNumber += parsedNumberList.get(i);
+        }
 
-        //System.out.println("Die römische Zahl" + romanNumeral +" entspricht der Dezimalzahl: " + resultNumber + ".");
+        System.out.println("Die römische Zahl " + romanNumeral + " entspricht der Dezimalzahl: " + resultNumber + ".");
     }
 }
